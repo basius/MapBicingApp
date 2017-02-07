@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 /**
@@ -27,7 +29,11 @@ public class MainActivityFragment extends Fragment {
         map.setTilesScaledToDpi(true);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
-
+        GeoPoint startPoint = new GeoPoint(48.13, -1.63);
+        IMapController mapController = map.getController();
+        mapController.setZoom(9);
+        mapController.setCenter(startPoint);
+        map.invalidate();
         return view;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.basius.mapbicingapp;
 
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -8,9 +9,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.net.HttpURLConnection;
-import java.net.URL;
 /**
  * Created by basius on 7/02/17.
  */
@@ -18,14 +16,15 @@ import java.net.URL;
 public class BicingApi {
     public static final String BASE_URL = "http://wservice.viabicing.cat/v2/stations";
 
-    static List<Estacio> getStations(){
+    ArrayList<Estacio> getStations(){
         Uri builtUri = Uri.parse(BASE_URL)
                 .buildUpon()
                 .build();
         String url = builtUri.toString();
         return doCall(url);
     }
-    static List<Estacio> doCall(String url) {
+    @Nullable
+    ArrayList<Estacio> doCall(String url) {
         try {
             String JsonResponse = HttpUtils.get(url);
             return processJson(JsonResponse);
@@ -34,8 +33,8 @@ public class BicingApi {
         }
         return null;
     }
-    static List<Estacio> processJson(String jsonResponse) {
-        List<Estacio> estacions = new ArrayList<>();
+    ArrayList<Estacio> processJson(String jsonResponse) {
+        ArrayList<Estacio> estacions = new ArrayList<Estacio>();
         try {
             JSONObject data = new JSONObject(jsonResponse);
             JSONArray stations = data.getJSONArray("stations");

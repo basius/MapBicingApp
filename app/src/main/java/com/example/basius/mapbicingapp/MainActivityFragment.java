@@ -1,30 +1,29 @@
 package com.example.basius.mapbicingapp;
-
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
     MapView map;
+    BicingApi api = new BicingApi();
     private MyLocationNewOverlay myLocationOverlay;
-    private MinimapOverlay mMinimapOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
     private CompassOverlay mCompassOverlay;
     private IMapController mapController;
@@ -43,7 +42,6 @@ public class MainActivityFragment extends Fragment {
 
         map.invalidate();
 
-        //List<Estacio> estacions = BicingApi.getStations();
         return view;
     }
     private void initializeMap() {
@@ -91,4 +89,34 @@ public class MainActivityFragment extends Fragment {
         map.getOverlays().add(this.mScaleBarOverlay);
         map.getOverlays().add(this.mCompassOverlay);
     }
+
+    private void refresh(){
+        RefreshDataTask task = new RefreshDataTask();
+        task.execute();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        refresh();
+    }
+
+    private class RefreshDataTask extends AsyncTask<Void, Void, ArrayList<Estacio>> {
+
+        @Override
+        protected ArrayList<Estacio> doInBackground(Void... voids) {
+            ArrayList<Estacio> estacions = new ArrayList<Estacio>();
+            estacions = api.getStations();
+            return estacions;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Estacio> estacions) {
+            for (Estacio estacio : estacions){
+                Log.d("Carrer", estacio.getStreetName());
+            }
+        }
+    }
+
+
 }

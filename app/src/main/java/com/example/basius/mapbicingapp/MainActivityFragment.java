@@ -1,4 +1,7 @@
 package com.example.basius.mapbicingapp;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -8,8 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
@@ -27,6 +33,7 @@ public class MainActivityFragment extends Fragment {
     private ScaleBarOverlay mScaleBarOverlay;
     private CompassOverlay mCompassOverlay;
     private IMapController mapController;
+    private RadiusMarkerClusterer biciMarkers;
     public MainActivityFragment() {
     }
 
@@ -44,6 +51,76 @@ public class MainActivityFragment extends Fragment {
 
         return view;
     }
+
+    private void setMarkers( ArrayList<Estacio> estacions) {
+        setupMarkerOverlay();
+
+        Drawable clusterIconD = getResources().getDrawable(R.drawable.ic_agrupacioestacions);
+        Bitmap clusterIcon = ((BitmapDrawable)clusterIconD).getBitmap();
+
+        biciMarkers.setIcon(clusterIcon);
+
+        for (Estacio estacio : estacions){
+            Marker marker = new Marker(map);
+            //Transformem l'string de latitud i longitud en double per obtenir el punt exacte
+            GeoPoint point = new GeoPoint(Double.parseDouble(estacio.getLatitude()),Double.parseDouble(estacio.getLongitude()));
+            marker.setPosition(point);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            String infoEstacio = estacio.getStreetName()+", "+ estacio.getStreetNumber()+"\n";
+            int ocupacio = (Integer.parseInt(estacio.getBikes())*100/
+                    (Integer.parseInt(estacio.getBikes()+estacio.getSlots())));
+            //Diferenciem si es estacio electrica i normal i apliquem icona segons perecentatge
+            if(estacio.getType().equals("BIKE")){
+                infoEstacio += "MANUAL\n";
+                if(ocupacio==0){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_normal_0));
+                }else if(ocupacio<=25){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_normal_25));
+                }else if(ocupacio<=50){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_normal_50));
+                }else if(ocupacio<=75){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_normal_75));
+                }else if(ocupacio<=100){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_normal_100));
+                }
+
+            }else {
+                infoEstacio += "ELECTRICA\n";
+                if(ocupacio==0){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_electric_0));
+                }else if(ocupacio<=25){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_electric_25));
+                }else if(ocupacio<=50){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_electric_50));
+                }else if(ocupacio<=75){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_electric_75));
+                }else if(ocupacio<=100){
+                    marker.setIcon(getResources().getDrawable(R.drawable.ic_electric_100));
+                }
+            }
+
+            infoEstacio += estacio.getBikes()+" bicis disponibles";
+            marker.setTitle(infoEstacio);
+            //Calculem el percentatge d'ocupacio
+
+
+            marker.setAlpha(0.6f);
+            biciMarkers.add(marker);
+        }
+        biciMarkers.invalidate();
+        map.invalidate();
+
+
+
+    }
+
+    private void setupMarkerOverlay() {
+
+        biciMarkers = new RadiusMarkerClusterer(getContext());
+        map.getOverlays().add(biciMarkers);
+        biciMarkers.setRadius(100);
+    }
+
     private void initializeMap() {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setTilesScaledToDpi(true);
@@ -110,9 +187,7 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(ArrayList<Estacio> estacions) {
-            for (Estacio estacio : estacions){
-                Log.d("Carrer", estacio.getStreetName());
-            }
+            setMarkers(estacions);
         }
     }
 

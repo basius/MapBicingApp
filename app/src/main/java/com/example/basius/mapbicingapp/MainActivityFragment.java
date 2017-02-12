@@ -39,7 +39,7 @@ public class MainActivityFragment extends Fragment {
         initializeMap();
         setZoom();
         setOverlays();
-
+        refresh();
         map.invalidate();
 
         return view;
@@ -72,8 +72,6 @@ public class MainActivityFragment extends Fragment {
                         .getMyLocation());
             }
         });
-
-
         mScaleBarOverlay = new ScaleBarOverlay(map);
         mScaleBarOverlay.setCentred(true);
         mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
@@ -84,11 +82,12 @@ public class MainActivityFragment extends Fragment {
                 map
         );
         mCompassOverlay.enableCompass();
-
         map.getOverlays().add(myLocationOverlay);
         map.getOverlays().add(this.mScaleBarOverlay);
         map.getOverlays().add(this.mCompassOverlay);
     }
+
+
 
     private void refresh(){
         RefreshDataTask task = new RefreshDataTask();
@@ -105,8 +104,7 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected ArrayList<Estacio> doInBackground(Void... voids) {
-            ArrayList<Estacio> estacions = new ArrayList<Estacio>();
-            estacions = api.getStations();
+            ArrayList<Estacio> estacions = api.getStations();
             return estacions;
         }
 

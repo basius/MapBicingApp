@@ -68,7 +68,7 @@ public class MainActivityFragment extends Fragment {
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             String infoEstacio = estacio.getStreetName()+", "+ estacio.getStreetNumber()+"\n";
             int ocupacio = (Integer.parseInt(estacio.getBikes())*100/
-                    (Integer.parseInt(estacio.getBikes()+estacio.getSlots())));
+                    (Integer.parseInt(1+estacio.getSlots())));
             //Diferenciem si es estacio electrica i normal i apliquem icona segons perecentatge
             if(estacio.getType().equals("BIKE")){
                 infoEstacio += "MANUAL\n";
@@ -80,7 +80,7 @@ public class MainActivityFragment extends Fragment {
                     marker.setIcon(getResources().getDrawable(R.drawable.ic_normal_50));
                 }else if(ocupacio<=75){
                     marker.setIcon(getResources().getDrawable(R.drawable.ic_normal_75));
-                }else if(ocupacio<=100){
+                }else if(ocupacio<=101){
                     marker.setIcon(getResources().getDrawable(R.drawable.ic_normal_100));
                 }
 
@@ -94,7 +94,7 @@ public class MainActivityFragment extends Fragment {
                     marker.setIcon(getResources().getDrawable(R.drawable.ic_electric_50));
                 }else if(ocupacio<=75){
                     marker.setIcon(getResources().getDrawable(R.drawable.ic_electric_75));
-                }else if(ocupacio<=100){
+                }else if(ocupacio<=101){
                     marker.setIcon(getResources().getDrawable(R.drawable.ic_electric_100));
                 }
             }
